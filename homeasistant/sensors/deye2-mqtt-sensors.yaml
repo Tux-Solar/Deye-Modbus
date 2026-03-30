@@ -1,0 +1,151 @@
+# reference
+# https://www.home-assistant.io/integrations/sensor.mqtt/
+# device classes: https://www.home-assistant.io/integrations/sensor/#device-class
+# State template: https://forum.hacf.fr/t/unites-de-mesure/64577/8
+
+# Deye-2 Inverter
+# ----------------  
+- unique_id: deye2_radiator_temp
+  name: DEYE2 Radiator Temp
+  device:
+    identifiers: Inverter-2
+    name: Inverter-2
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: measurement 
+  unit_of_measurement: "°C"
+  device_class: temperature
+  state_topic: deye2/Radiator-Temperature
+  value_template: "{{ ( value_json.data - 1000 ) | float / 10 }}"
+  enabled_by_default: true
+  
+- unique_id: deye2_load_consumption
+  name: DEYE2 Load Consumption
+  device:
+    identifiers: Inverter-2
+    name: Inverter-2
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: total_increasing
+  device_class: energy
+  unit_of_measurement: kWh
+  state_topic: deye2/Energy-Total-Consumption
+  value_template:  "{{ value_json.data | float / 10 }}"
+  enabled_by_default: true
+
+- unique_id: deye2_total_production
+  name: DEYE2 Total Production
+  device:
+    identifiers: Inverter-2
+    name: Inverter-2
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: total_increasing
+  unit_of_measurement: kWh
+  device_class: energy
+  state_topic: deye2/Energy-Total-Production
+  value_template:  "{{ value_json.data | float / 10 }}"
+  enabled_by_default: true
+
+- unique_id: deyer2_daily_production
+  name: DEYE2 Daily Production
+  device:
+    identifiers: Inverter-2
+    name: Inverter-2
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: total
+  unit_of_measurement: kWh
+  device_class: energy
+  state_topic: deye2/Energy-Daily-Production
+  value_template:  "{{ value_json.data | float / 10 }}"
+  enabled_by_default: true
+
+# Deye-2 MPTT1
+# ------------
+- unique_id: deye2_mptt1_power
+  name: DEYE2/MPTT1/Power
+  device:
+    identifiers: Inverter-2
+    name: Inverter-2
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  state_topic: deye2/MPTT-Power-1
+  value_template: "{{ value_json.data }}"
+  enabled_by_default: true
+
+- unique_id: deye2_mptt1_current
+  name: DEYE2/MPTT1/Current
+  device:
+    identifiers: Inverter-2
+    name: Inverter-2
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: measurement
+  device_class: current
+  unit_of_measurement: A
+  state_topic: deye2/MPTT-Current-1
+  value_template:  "{{ value_json.data  | float / 10 }}"
+  enabled_by_default: true 
+
+- unique_id: deye2_mptt1_voltage
+  name: DEYE2/MPTT1/Voltage
+  device:
+    identifiers: Inverter-2
+    name: Inverter-2
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: measurement
+  unit_of_measurement: V
+  device_class: voltage
+  state_topic: deye2/MPTT-Voltage-1
+  value_template: "{{ value_json.data  | float / 10 }}"
+  enabled_by_default: true
+
+# Deye-2 MPTT2
+# ------------
+- unique_id: deye2_mptt2_power
+  name: DEYE2/MPTT2/Power
+  device:
+    identifiers: Inverter-2
+    name: Inverter-2
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  state_topic: deye2/MPTT-Power-2
+  value_template: "{{ value_json.data }}"
+  enabled_by_default: true
+
+- name: DEYE2/MPTT2/Current
+  unique_id: mptt2_current
+  device:
+    identifiers: Inverter-2
+    name: Inverter-2
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: measurement
+  device_class: current
+  unit_of_measurement: A
+  state_topic: deye2/MPTT-Current-2
+  value_template:  "{{ value_json.data  | float / 10 }}"
+  enabled_by_default: true 
+
+- unique_id: deye2_mptt2_voltage
+  name: DEYE2/MPTT2/Voltage
+  device:
+    identifiers: Inverter-2
+    name: Inverter-2
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: measurement
+  unit_of_measurement: V
+  device_class: voltage
+  state_topic: deye2/MPTT-Voltage-2
+  value_template: "{{ value_json.data  | float / 10 }}"
+  enabled_by_default: true
+

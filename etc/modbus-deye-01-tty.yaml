@@ -1,0 +1,346 @@
+# DEYE inverter Modbus mapping
+# Author Fulup Ar foll
+# Date: nov-2025
+# Model: DEYE inverter SG03LP1-EU
+
+# Reference :
+# hexa: https://github.com/kbialek/deye-inverter-mqtt/blob/e9cb713defddff14296e9094beec098a5017d59a/ha_definitions/deye_sg02lp1_ha.yaml
+# deci: https://github.com/kbialek/deye-inverter-mqtt/blob/e9cb713defddff14296e9094beec098a5017d59a/ha_definitions/deye_sg02lp1_map.yaml
+
+# Notes:
+# - with multiple inverters in parallel mode, BMS data is only reported to Master Inverter.
+# - serial port provide the same modus information in RS232 on serial port, than on rs485 CAN/RS485 port.
+# - move count: 1 to count: 3 for 3 phases inverter
+# - even for READ only register DEYE request R/W function (Register_Holding)
+
+# Update udev rules & apply with ```udevadm control --reload-rules && udevadm trigger```
+# SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="ttyRS485"
+# SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", SYMLINK+="ttyRS232"
+
+
+# Low level debug modbus (when nothing works)
+# --------------------------------------------
+# generate custom request https://npulse.net/en/online-modbus
+# echo -ne "\x02\x03\x00\x17\x00\x01\x34\x3d" | socat - /dev/ttyUSB0,b9600 | od -t x1
+# echo -ne "\x01\x03\x00\x17\x00\x01\x34\x0e" | socat - /dev/serial/by-id/usb-Prolific_Technology_Inc._USB-Serial_Controller-if00-port0,b9600 | od -t x1
+
+name: afb-deye1
+no-ldpaths: true
+port: 1237
+alias:
+  - /devtools:/usr/share/afb-ui-devtools/binder
+  - /:/usr/share/afb-ui-devtools/binder
+
+extension:
+- path: "/usr/local/lib/libafb-mqtt-ext.so"
+"@extconfig":
+  MQTT:
+    config: { "$ref": "/home/fulup/Workspace/Tux-Solar/Deye-Modbus/etc/mqtt-deye-01.yaml" }
+
+binding:
+  - path: /usr/local/redpesk/modbus-binding/lib/modbus-binding.so
+    metadata:
+      uid: modbus-deye-01
+      version: "1.0"
+      api: deye1
+      info: Deye & Battery config & log
+    modbus:
+      uid: Deye-1-Inverter
+      info: DEYE main inverter
+      uri: tty://dev/serial/by-id/usb-Prolific_Technology_Inc._USB-Serial_Controller-if00-port0:9600
+      prefix: "tty"
+      slaveid: 1
+      timeout: 250
+      autostart: 1
+      privilege: deye:Modbus
+      hertz: 1
+      idle: 30
+      sensors:
+        # Inverter general config
+        - uid: Inverter-Status
+          info: Status 0:stand-by 1:Self-Check 2:normal 3:Fault
+          type: Register_Holding
+          format: UINT16
+          register: 59
+        - uid: Inverter-Work-Mode
+          info: Status 0:selling-first 1:zero-export-load&solar/sell 2:zero-export-home-solar/sell 3:zero-export-to-load 4:zero-export-to-home
+          type: Register_Holding
+          format: UINT16
+          register: 244
+        - uid: Inverter-Total-Power
+          info: Inverter total power in W
+          type: Register_Holding
+          format: UINT16
+          register: 175
+        - uid: Radiator-Temperature
+          register: 90
+          type: Register_Holding
+          format: UINT16
+        - uid: Max-Amp-Charge
+          register: 108
+          type: Register_Holding
+          format: UINT16
+        - uid: Max-Amp-Discharge
+          register: 109
+          type: Register_Holding
+          format: UINT16
+        - uid: Charging-Voltage
+          info: charging Voltage in 0.001v
+          register: 210
+          type: Register_Holding
+          format: INT16
+        - uid: Discharge-Voltage
+          info: discharging Voltage in 0.001v
+          register: 211
+          type: Register_Holding
+          format: UINT16
+        - uid: Charging-Current-Limit
+          info: charging current limiting in A
+          type: Register_Holding
+          format: UINT16
+          register: 212
+        - uid: Discharge-Current-Limit
+          info: discharging current limiting in A
+          type: Register_Holding
+          format: UINT16
+          register: 213
+        - uid: DC-Temperature
+          info:  in 0.1C 1000==0°C
+          type: Register_Holding
+          format: UINT16
+          register: 90
+        - uid: AC-Temperature
+          info: in 0.1C 1000==0°C
+          type: Register_Holding
+          format: UINT16
+          register: 91
+
+        # global power meeter
+        - uid: Energy-Total-Production
+          info: day energy in 0.1kWh
+          type: Register_Holding
+          #format: INT32
+          format: INT16
+          register: 96
+        - uid: Energy-Total-Consumption
+          info: total energy bought in 0.1 kWh
+          type: Register_Holding
+          #format: UINT32
+          format: UINT16
+          register: 78
+        - uid: Energy-Daily-Consumption
+          info: daily energy bought in 0.1 kWh
+          type: Register_Holding
+          format: UINT16
+          register: 76
+        - uid: Energy-Daily-Production
+          info: day energy in 0.1kWh
+          type: Register_Holding
+          format: UINT16
+          register: 108
+        - uid: Energy-CT-Power
+          info: consumption/production CT in W
+          type: Register_Holding
+          format: UINT16
+          register: 170
+
+        # Grid definitions
+        - uid: Grid-Connected-Status
+          info: 0:Off-Grid 1:On-Grid
+          type: Register_Holding
+          format: BOOL
+          register: 170
+          count: 1
+        - uid: Grid-Frequency
+          info: grid frequency in 0.01Hz
+          type: Register_Holding
+          format: UINT16
+          register: 192
+        - uid: Grid-Tension
+          info: grid voltage in 0.1V
+          type: Register_Holding
+          format: UINT16
+          register: 150
+          count: 1
+        - uid: Grid-Current
+          info: grid current in 0.01A
+          type: Register_Holding
+          format: UINT16
+          register: 164
+          count: 1
+        - uid: Grid-Power
+          info: inverter phase-1 in W
+          type: Register_Holding
+          format: UINT16
+          register: 173
+          count: 1
+
+        # Load definitions
+        - uid: Load-Total-Power
+          info: load power in W
+          type: Register_Holding
+          format: UINT16
+          register: 130
+        - uid: Load-Power
+          info: load current power in W
+          type: Register_Holding
+          format: UINT16
+          register: 176
+          count: 1
+        - uid: Load-Voltage
+          info: load current voltage in 0.1V
+          type: Register_Holding
+          format: UINT16
+          register: 157
+          count: 1
+        - uid: Load-Daily-Consumption
+          info: load daily consumption in 0.1kWh
+          type: Register_Holding
+          format: UINT16
+          register: 84
+        - uid: Load-Total-Consumption
+          info: load total consumption in 0.1kWh
+          type: Register_Holding
+          #format: UINT32
+          format: UINT16
+          register: 85
+        - uid: Load-Frequency
+          info: load frequency 0.1Hz
+          type: Register_Holding
+          format: UINT16
+          register: 192
+        - uid: Load-Smart-Switch
+          info: load smart Switch true/false
+          type: Register_Holding
+          format: BOOL
+          register: 195
+
+        # MPPT input DC section
+        - uid: MPTT-Power-1
+          info: DC input power 1 in W
+          type: Register_Holding
+          format: INT16
+          register: 186
+          count: 1
+        - uid: MPTT-Voltage-1
+          info: DC input voltage 1 in 0.1V
+          type: Register_Holding
+          format: INT16
+          register: 109
+        - uid: MPTT-Current-1
+          info: DC input current 1 in 0.1A
+          type: Register_Holding
+          format: INT16
+          register: 110
+        - uid: MPTT-Power-2
+          info: DC input power 1 in W
+          type: Register_Holding
+          format: INT16
+          register: 187
+          count: 1
+        - uid: MPTT-Voltage-2
+          info: DC voltage 1 in 0.1V
+          type: Register_Holding
+          format: INT16
+          register: 111
+        - uid: MPTT-Current-2
+          info: DC current 1 in 0.1A
+          type: Register_Holding
+          format: INT16
+          register: 112
+
+        # Battery definitions
+        - uid: Battery-Temperature
+          info: battery temperature in 1000+temp*0.1°C
+          type: Register_Holding
+          format: UINT16
+          register: 182
+        - uid: Battery-Voltage
+          info: battery voltage in 0.01V
+          type: Register_Holding
+          format: UINT16
+          register: 183
+        - uid: Battery-Current
+          info: battery current in 0.01A
+          type: Register_Holding
+          format: INT16
+          register: 191
+        - uid: Battery-SOC
+          info: battery SOC in %
+          type: Register_Holding
+          format: UINT16
+          register: 184
+        - uid: Battery-Status
+          info: 0=charged 1=standby 2=discharge
+          type: Register_Holding
+          format: UINT16
+          register: 189
+        - uid: Battery-Power
+          info: battery Power in W
+          type: Register_Holding
+          format: INT16
+          register: 190
+        - uid: Battery-Daily-Charge
+          info: battery charge in 0.1kWh
+          type: Register_Holding
+          format: UINT16
+          register: 70
+        - uid: Battery-Daily-Discharge
+          info: battery discharge in 0.1kWh
+          type: Register_Holding
+          format: UINT16
+          register: 71
+        - uid: Battery-Total-Charge
+          info: battery charge in 0.1kWh
+          type: Register_Holding
+          format: UINT16
+          register: 72
+        - uid: Battery-Total-Discharge
+          info: battery discharge in 0.1kWh
+          type: Register_Holding
+          format: UINT16
+          register: 74
+
+        # BMS definitions
+        - uid: BMS-Voltage
+          info: BMS voltage in 0.01V
+          type: Register_Holding
+          format: UINT16
+          register: 317
+        - uid: BMS-Current
+          info: BMS current in 0.01 A
+          type: Register_Holding
+          format: UINT16
+          register: 318
+        - uid: BMS-Temperature
+          info: BMS temperature in 0.1°C
+          type: Register_Holding
+          format: UINT16
+          register: 319
+        - uid: BMS-Charging-Voltage
+          info: BMS charging in V
+          type: Register_Holding
+          format: UINT16
+          register: 312
+        - uid: BMS-Discharge-Voltage
+          info: BMS charging in V
+          type: Register_Holding
+          format: UINT16
+          register: 313
+        - uid: BMS-Charging-Current-Limit
+          info: BMS charging in A
+          type: Register_Holding
+          format: UINT16
+          register: 314
+        - uid: BMS-Disharge-Current-Limit
+          info: BMS discharge limit in A
+          type: Register_Holding
+          format: UINT16
+          register: 315
+        - uid: BMS-SOC
+          info: BMS max charge in %
+          type: Register_Holding
+          format: UINT16
+          register: 316
+
+

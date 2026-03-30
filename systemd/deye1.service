@@ -1,0 +1,31 @@
+# Author: Fulup Ar Foll fulup@iot.bzh
+# Object: Start Deye monitoring service
+# sudo cp deye.service /usr/lib/systemd/system/.
+# sudo systemctl daemon-reload
+# sudo systemctl start deye
+# sudo journalctl -fxeu deye.service
+# sudo systemctl enable deye
+
+[Unit]
+Wants=network-online.target
+After=network-online.target
+Description=Deye French MID meeter monitoring
+Wants=mosquitto.service
+After=mosquitto.service
+
+[Install]
+# Start by default on boot
+WantedBy=multi-user.target default.target
+
+[Service]
+# note: environement var are not exported to final process
+Environment="LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:/usr/local/redpesk/modbus-binding/lib"
+EnvironmentFile=/etc/secrets/mqtt.secrets
+Restart=always
+RestartSec=10
+User=fulup
+ExecStop=pkill afb-deye1
+Delegate=yes
+SyslogIdentifier=%N
+ExecStart=/usr/local/bin/afb-binder -v --config=/home/fulup/Workspace/Tux-Solar/Deye-Modbus/etc/modbus-deye-01-tty.yaml --port=1237
+

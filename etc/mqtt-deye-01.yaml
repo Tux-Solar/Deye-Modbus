@@ -1,0 +1,88 @@
+# mosquitto_sub  -h localhost -u linky -P '!GizKoz007' -t 'deye2/#' -v
+broker-host: "localhost"
+broker-user: $DEYE_USR
+broker-pwd: $DEYE_PWD
+broker-port: 1883
+client-id: afb-deye1 
+mapping-type: topic-pair
+publish-topic: deye1
+publish-extend: true
+to-mqtt:
+  event:
+    # auto-register to following events
+    registrations:
+      - api: deye1
+        verb: tty/Radiator-Temperature
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/Energy-Total-Production
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/Energy-Daily-Production
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/Energy-Total-Consumption
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/DC-Temperature
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/AC-Temperature
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/MPTT-Voltage-1
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/MPTT-Current-1
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/MPTT-Power-1
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/MPTT-Voltage-2
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/MPTT-Current-2
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/MPTT-Power-2
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/Battery-Temperature
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/Battery-SOC
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/Battery-Current
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/Battery-Voltage
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/Battery-Total-Charge
+        args:
+          action: subscribe
+      - api: deye1
+        verb: tty/Battery-Total-Discharge
+        args:
+          action: subscribe
+
+    template:
+      data: "%{data}"

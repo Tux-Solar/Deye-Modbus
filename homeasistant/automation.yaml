@@ -1,0 +1,78 @@
+alias: Voiture On/Off
+description: ""
+triggers:
+  - trigger: time_pattern
+    minutes: /10
+conditions:
+  - condition: sun
+    before: sunset
+    after: sunrise
+  - condition: numeric_state
+    entity_id: input_number.voiture_forced_flag
+    below: 1
+actions:
+  - choose:
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.linky_meeter_ct_average
+            below: 500
+          - condition: or
+            conditions:
+              - condition: numeric_state
+                entity_id: sensor.inverter_bms_battery_soc
+                above: 80
+              - condition: numeric_state
+                entity_id: sensor.solar_average_power
+                above: 3000
+        sequence:
+          - action: switch.turn_on
+            metadata: {}
+            data: {}
+            target:
+              entity_id: switch.energie_voiture
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 15
+              milliseconds: 0
+          - type: turn_on
+            device_id: 7d421577a68cb05f2744c8f4590ce0f0
+            entity_id: 97fd78b0a6d7ecac7d81e3f99868811f
+            domain: switch
+          - action: timer.start
+            metadata: {}
+            target:
+              entity_id: timer.timer_voiture
+            data: {}
+      - conditions:
+          - condition: or
+            conditions:
+              - condition: numeric_state
+                entity_id: sensor.linky_meeter_ct_average
+                above: 1000
+              - condition: numeric_state
+                entity_id: sensor.inverter_bms_battery_soc
+                below: 40
+                enabled: true
+        sequence:
+          - type: turn_off
+            device_id: 7d421577a68cb05f2744c8f4590ce0f0
+            entity_id: 97fd78b0a6d7ecac7d81e3f99868811f
+            domain: switch
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 15
+              milliseconds: 0
+          - action: switch.turn_off
+            metadata: {}
+            data: {}
+            target:
+              entity_id: switch.energie_voiture
+          - action: timer.pause
+            metadata: {}
+            target:
+              entity_id: timer.timer_voiture
+            data: {}
+mode: single
+

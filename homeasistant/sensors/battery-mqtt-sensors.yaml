@@ -1,0 +1,86 @@
+# Battery section
+# ----------------
+- unique_id: battery_temp
+  name: Battery Temperature
+  device:
+    identifiers: Inverter-BMS
+    model_id: deye-battery
+    name: Inverter-BMS
+    model: Deye Battery
+  state_class: measurement
+  unit_of_measurement: "°C"
+  device_class: temperature
+  state_topic: deye2/Battery-Temperature
+  value_template: "{{ ( value_json.data - 1000 ) | float / 10 }}"
+  enabled_by_default: true
+
+- unique_id: battery_current
+  name: Battery Current
+  device:
+    identifiers: Inverter-BMS
+    model_id: deye-battery
+    name: Inverter-BMS
+    model: Deye Battery
+  state_class: measurement
+  unit_of_measurement: A
+  device_class: current
+  state_topic: deye2/Battery-Current
+  value_template: "{{ value_json.data | float / 100 }}"
+  enabled_by_default: true
+
+- unique_id: battery_voltage
+  name: Battery Voltage
+  device:
+    identifiers: Inverter-BMS
+    model_id: deye-battery
+    name: Inverter-BMS
+    model: Deye Battery
+  state_class: measurement
+  unit_of_measurement: V
+  device_class: voltage
+  state_topic: deye2/Battery-Voltage
+  value_template: "{{ value_json.data | float / 100 }}"
+  enabled_by_default: true
+
+- unique_id: battery_soc
+  name: Battery SOC
+  device:
+    identifiers: Inverter-BMS
+    model_id: deye-battery
+    name: Inverter-BMS
+    model: Deye Battery
+  state_class: measurement
+  unit_of_measurement: "%"
+  device_class: battery
+  state_topic: deye2/Battery-SOC
+  value_template: "{{ value_json.data }}"
+  enabled_by_default: true
+
+- unique_id: battery_total_discharge
+  name: Battery Total Discharge
+  device:
+    identifiers: Inverter-BMS
+    model_id: deye-battery
+    name: Inverter-BMS
+    model: Deye Battery
+  state_class: total_increasing
+  unit_of_measurement: kWh
+  device_class: energy
+  state_topic: deye2/Battery-Total-Discharge
+  value_template: "{{ value_json.data | float / 10 }}"
+  enabled_by_default: true
+
+- unique_id: battery_total_charge
+  name: Battery Total Charge
+  device:
+    identifiers: Inverter-BMS
+    model_id: deye-battery
+    name: Inverter-BMS
+    model: Deye Battery
+  state_class: total_increasing
+  unit_of_measurement: kWh
+  device_class: energy
+  state_topic: deye2/Battery-Total-Charge
+  value_template: "{{ value_json.data | float / 10 }}"
+  enabled_by_default: true
+    
