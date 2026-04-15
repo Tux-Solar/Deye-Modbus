@@ -1,0 +1,77 @@
+# reference
+# https://www.home-assistant.io/integrations/sensor.mqtt/
+# device classes: https://www.home-assistant.io/integrations/sensor/#device-class
+# State template: https://forum.hacf.fr/t/unites-de-mesure/64577/8
+
+-
+  unique_id: CT_instant_power
+  name: CT Instant Power
+  device:
+    identifiers: Linky
+    name: Linky-Meeter
+    model: Linky French Home Meeter
+    model_id: linky-v3
+  state_class: measurement
+  device_class: power
+  unit_of_measurement: W
+  state_topic: deye2/Energy-CT-Power
+  value_template: "{{ value_json.data | float }}"
+  enabled_by_default: true
+
+-
+  unique_id: linky_instant_current
+  name: Linky Instant Current
+  device:
+    identifiers: Linky
+    name: Linky-Meeter
+    model: Linky French Home Meeter
+    model_id: linky-v3
+  state_class: measurement
+  device_class: current
+  unit_of_measurement: A
+  state_topic: linky/instant-current
+  value_template:  "{{ value_json.data.IRMS1 }}"
+  enabled_by_default: true
+
+- unique_id: linky_instant_voltage
+  name: Linky Instant Voltage
+  device:
+    identifiers: Linky
+    name: Linky-Meeter
+    model: Linky French Home Meeter
+    model_id: linky-v3
+  state_class: measurement
+  unit_of_measurement: V
+  device_class: voltage
+  state_topic: linky/instant-voltage
+  value_template: "{{ value_json.data.URMS1 }}"
+  enabled_by_default: true
+
+- unique_id: linky_total_energy
+  name: Linky Total Energy
+  device:
+    identifiers: Linky
+    name: Linky-Meeter
+    model: Linky French Home Meeter
+    model_id: linky-v3
+  state_class: total_increasing
+  unit_of_measurement: kWh
+  device_class: energy
+  state_topic: linky/energy-counter
+  value_template: "{{ value_json.data.EAST | float / 1000 }}"
+  enabled_by_default: true
+
+- unique_id: linky_instant_energy
+  name: Linky Instant Energy
+  device:
+    identifiers: Linky
+    name: Linky-Meeter
+    model: Linky French Home Meeter
+    model_id: linky-v3
+  state_class: measurement
+  unit_of_measurement: VA
+  device_class: apparent_power
+  state_topic: linky/instant-power
+  value_template: "{{ value_json.data.SINSTS | int }}"
+  enabled_by_default: true
+

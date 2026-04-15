@@ -148,3 +148,31 @@
   state_topic: deye1/MPTT-Voltage-2
   value_template: "{{ value_json.data  | float / 10 }}"
   enabled_by_default: true
+
+- unique_id: deye1_load_power
+  name: DEYE1/Load/Power
+  device:
+    identifiers: Inverter-1
+    name: Inverter-1
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  state_topic: deye1/Load-Power
+  value_template: "{{ value_json.data  | int }}"
+  enabled_by_default: true
+
+- unique_id: deye1_grid_power
+  name: DEYE1/Grid/Power
+  device:
+    identifiers: Inverter-1
+    name: Inverter-1
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  state_topic: deye1/Grid-Power
+  value_template: "{{ value_json.data  | int }}"
+  enabled_by_default: true

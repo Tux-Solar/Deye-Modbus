@@ -1,0 +1,15 @@
+# ref: https://forum.hacf.fr/t/creation-dun-capteur-virtuel/38359/1
+- name: Inverters Total Power
+  unique_id: inverters-instant-power
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  state: "{{ (states('sensor.inverter1_instant_power') |int(0)) + (states('sensor.inverter2_instant_power') |int(0)) }}"
+
+- name: Inverters Instant Injection
+  unique_id: inverters-instant_injection
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  state: "{{ (states('sensor.inverter_2_deye2_load_power') |int(0)) + (states('sensor.inverter_2_deye2_grid_power') |int(0)) }}"
+

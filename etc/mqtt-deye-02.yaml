@@ -87,6 +87,16 @@ to-mqtt:
         verb: tty/Battery-Total-Discharge
         args:
           action: subscribe
+      - api: deye2
+        verb: tty/Grid-Power
+        args:
+          action: subscribe
+      - api: deye2
+        verb: tty/Load-Power
+        args:
+          action: subscribe
+
+
 
     template:
       data: "%{data}"

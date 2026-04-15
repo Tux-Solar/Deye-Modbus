@@ -149,3 +149,30 @@
   value_template: "{{ value_json.data  | float / 10 }}"
   enabled_by_default: true
 
+- unique_id: deye2_load_power
+  name: DEYE2/Load/Power
+  device:
+    identifiers: Inverter-2
+    name: Inverter-2
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  state_topic: deye2/Load-Power
+  value_template: "{{ value_json.data  | int }}"
+  enabled_by_default: true
+
+- unique_id: deye2_grid_power
+  name: DEYE2/Grid/Power
+  device:
+    identifiers: Inverter-2
+    name: Inverter-2
+    model: Deye 6.5KVA
+    model_id: deye-inverter
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  state_topic: deye2/Grid-Power
+  value_template: "{{ value_json.data  | int }}"
+  enabled_by_default: true

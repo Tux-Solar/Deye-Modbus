@@ -1,0 +1,7 @@
+# ref: https://forum.hacf.fr/t/creation-dun-capteur-virtuel/38359/2
+- name: BMS Instant Power
+  unique_id: bms_battery_load
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  state: "{{ (states('sensor.inverter_bms_battery_voltage') | float(0)) * (states('sensor.inverter_bms_battery_current') | float(0)) }}"

@@ -1,0 +1,7 @@
+# ref: https://forum.hacf.fr/t/creation-dun-capteur-virtuel/38359/1
+- name: Inverter1 Instant Power
+  unique_id: inverter1-instant_power
+  state_class: measurement
+  unit_of_measurement: W
+  device_class: power
+  state: "{{ (states('sensor.inverter_1_deye1_mptt1_power') | int(0)) + (states('sensor.inverter_1_deye1_mptt2_power') | int(0)) }}"
