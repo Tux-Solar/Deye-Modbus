@@ -5,3 +5,15 @@
   unit_of_measurement: W
   device_class: power
   state: "{{ (states('sensor.inverter_bms_battery_voltage') | float(0)) * (states('sensor.inverter_bms_battery_current') | float(0)) }}"
+- name: BMS Total charge
+  unique_id: bms_battery_charge
+  state_class: total_increasing
+  unit_of_measurement: kWh
+  device_class: energy
+  state: "{{ (states('sensor.inverter_1_deye1_battery_total_charge') | float(0)) + (states('sensor.inverter_2_deye2_battery_total_charge') | float(0)) }}"
+- name: BMS Total discharge
+  unique_id: bms_battery_discharge
+  state_class: total_increasing
+  unit_of_measurement: kWh
+  device_class: energy
+  state: "{{ (states('sensor.inverter_1_deye1_battery_total_discharge') | float(0)) + (states('sensor.inverter_2_deye2_battery_total_discharge') | float(0)) }}"
